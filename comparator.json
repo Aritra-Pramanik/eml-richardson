@@ -2,6 +2,10 @@
   "challenge_module": "Challenge",
   "solution_module": "Solution",
   "theorem_names": [
+    "EmlRichardson.decE_encE",
+    "EmlRichardson.encE_decE",
+    "EmlRichardson.decR_encR",
+    "EmlRichardson.encR_decR",
     "EmlRichardson.compiler_exists",
     "EmlRichardson.eml_zero_undecidable_final",
     "EmlRichardson.eml_root_undecidable_final",
@@ -10,5 +14,9 @@
     "EmlRichardson.eml_zero_undecidable_any",
     "EmlRichardson.eml_root_undecidable_any"
   ],
-  "permitted_axioms": ["propext", "Quot.sound", "Classical.choice"]
+  "permitted_axioms": [
+    "propext",
+    "Quot.sound",
+    "Classical.choice"
+  ]
 }

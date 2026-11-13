@@ -85,7 +85,8 @@ noncomputable def EmlExpr.evalC (x : ℂ) : EmlExpr → ℂ
 /-! ## Gödel numberings
 
 Explicit bijections with ℕ. They fix the `Primcodable` structures, and hence the meaning
-of `Computable` and `ComputablePred`, in the statements below. -/
+of `Computable` and `ComputablePred`, in the statements below. The four inverse laws are
+left as `sorry` here; `Solution.lean` proves them, and Comparator checks those proofs. -/
 
 /-- one ↦ 0, x ↦ 1, eml(l, r) ↦ ⟨l, r⟩ + 2, with Mathlib's pairing `Nat.pair`. -/
 def encE : EmlExpr → ℕ
@@ -102,21 +103,11 @@ termination_by n => n
 decreasing_by
   all_goals (have := Nat.unpair_left_le n; have := Nat.unpair_right_le n; omega)
 
-theorem decE_encE : ∀ t, decE (encE t) = t
-  | .one => by simp [encE, decE]
-  | .var => by simp [encE, decE]
-  | .app l r => by simp only [encE, decE, Nat.unpair_pair, decE_encE l, decE_encE r]
+theorem decE_encE : ∀ t, decE (encE t) = t := by
+  sorry
 
-theorem encE_decE : ∀ n, encE (decE n) = n
-  | 0 => by simp [encE, decE]
-  | 1 => by simp [encE, decE]
-  | n + 2 => by
-    have := Nat.unpair_left_le n
-    have := Nat.unpair_right_le n
-    simp only [decE, encE, encE_decE n.unpair.1, encE_decE n.unpair.2, Nat.pair_unpair]
-termination_by n => n
-decreasing_by
-  all_goals (have := Nat.unpair_left_le n; have := Nat.unpair_right_le n; omega)
+theorem encE_decE : ∀ n, encE (decE n) = n := by
+  sorry
 
 /-- The Gödel numbering of EML trees. -/
 def eE : EmlExpr ≃ ℕ := ⟨encE, decE, decE_encE, encE_decE⟩
@@ -151,61 +142,11 @@ termination_by n => n
 decreasing_by
   all_goals (have := Nat.unpair_left_le (n / 6); have := Nat.unpair_right_le (n / 6); have := Nat.div_le_self n 6; omega)
 
-theorem decR_encR : ∀ e, decR (encR e) = e
-  | .pi => by simp [encR, decR]
-  | .ln2 => by simp [encR, decR]
-  | .var => by simp [encR, decR]
-  | .rat p q d => by
-    have h1 : 6 * Nat.pair p (Nat.pair q d) % 6 = 0 := by omega
-    have h2 : 6 * Nat.pair p (Nat.pair q d) / 6 = Nat.pair p (Nat.pair q d) := by omega
-    show decR (6 * Nat.pair p (Nat.pair q d) + 3) = _
-    simp only [decR]; simp [h1, h2, Nat.unpair_pair]
-  | .add a b => by
-    have h1 : (6 * Nat.pair (encR a) (encR b) + 1) % 6 = 1 := by omega
-    have h2 : (6 * Nat.pair (encR a) (encR b) + 1) / 6 = Nat.pair (encR a) (encR b) := by omega
-    show decR (6 * Nat.pair (encR a) (encR b) + 1 + 3) = _
-    simp only [decR]; simp [h1, h2, Nat.unpair_pair, decR_encR a, decR_encR b]
-  | .mul a b => by
-    have h1 : (6 * Nat.pair (encR a) (encR b) + 2) % 6 = 2 := by omega
-    have h2 : (6 * Nat.pair (encR a) (encR b) + 2) / 6 = Nat.pair (encR a) (encR b) := by omega
-    show decR (6 * Nat.pair (encR a) (encR b) + 2 + 3) = _
-    simp only [decR]; simp [h1, h2, Nat.unpair_pair, decR_encR a, decR_encR b]
-  | .sin a => by
-    have h1 : (6 * encR a + 3) % 6 = 3 := by omega
-    have h2 : (6 * encR a + 3) / 6 = encR a := by omega
-    show decR (6 * encR a + 3 + 3) = _
-    simp only [decR]; simp [h1, h2, decR_encR a]
-  | .exp a => by
-    have h1 : (6 * encR a + 4) % 6 = 4 := by omega
-    have h2 : (6 * encR a + 4) / 6 = encR a := by omega
-    show decR (6 * encR a + 4 + 3) = _
-    simp only [decR]; simp [h1, h2, decR_encR a]
-  | .abs a => by
-    have h1 : (6 * encR a + 5) % 6 = 5 := by omega
-    have h2 : (6 * encR a + 5) / 6 = encR a := by omega
-    show decR (6 * encR a + 5 + 3) = _
-    simp only [decR]; simp [h1, h2, decR_encR a]
+theorem decR_encR : ∀ e, decR (encR e) = e := by
+  sorry
 
-theorem encR_decR : ∀ n, encR (decR n) = n
-  | 0 => by simp [encR, decR]
-  | 1 => by simp [encR, decR]
-  | 2 => by simp [encR, decR]
-  | n + 3 => by
-    have := Nat.unpair_left_le (n / 6)
-    have := Nat.unpair_right_le (n / 6)
-    have := Nat.div_le_self n 6
-    have := Nat.div_add_mod n 6
-    simp only [decR]
-    split_ifs
-    · simp only [encR, Nat.pair_unpair]; omega
-    · rw [encR, encR_decR (n / 6).unpair.1, encR_decR (n / 6).unpair.2, Nat.pair_unpair]; omega
-    · rw [encR, encR_decR (n / 6).unpair.1, encR_decR (n / 6).unpair.2, Nat.pair_unpair]; omega
-    · rw [encR, encR_decR (n / 6)]; omega
-    · rw [encR, encR_decR (n / 6)]; omega
-    · rw [encR, encR_decR (n / 6)]; omega
-termination_by n => n
-decreasing_by
-  all_goals (have := Nat.unpair_left_le (n / 6); have := Nat.unpair_right_le (n / 6); have := Nat.div_le_self n 6; omega)
+theorem encR_decR : ∀ n, encR (decR n) = n := by
+  sorry
 
 /-- The Gödel numbering of Richardson expressions. -/
 def eR : RExpr ≃ ℕ := ⟨encR, decR, decR_encR, encR_decR⟩
