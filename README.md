@@ -20,6 +20,7 @@ The proof contains no `sorry`. Every theorem uses only Lean's standard axioms (`
 
 | Theorem | Statement |
 | --- | --- |
+| `compiler_exists` | a computable map from Richardson expressions to EML trees preserves every real value and never takes log 0 |
 | `eml_zero_undecidable_final` | Richardson ⇒ "is t ≡ 0 on ℝ?" is not computable |
 | `eml_root_undecidable_final` | Richardson ⇒ "does t have a real root?" is not computable |
 | `compile_safe` | no compiled tree ever takes log 0, at any real input |
@@ -44,13 +45,34 @@ The encodings, and the proof that the compiler is primitive recursive, are fully
    Gödel numbers), so a decider for EML trees would yield a decider for Richardson
    expressions.
 
+## Files
+
+- [`Challenge.lean`](Challenge.lean): the definitions and the exact theorem statements, short enough
+  to audit. It imports only Mathlib.
+- [`Solution.lean`](Solution.lean): the full development: gadgets, branch-cut lemmas, the
+  log-0 safety proof, computability, and proofs of every Challenge statement.
+- [`comparator.json`](comparator.json): tells [Comparator](https://github.com/leanprover/comparator)
+  to check that `Solution` proves exactly the `Challenge` statements, using only the standard axioms.
+- [`formalization.yaml`](formalization.yaml): provenance, sources, AI involvement and review status.
+
 ## Checking it
 
-The proof builds against Mathlib (pinned in `lakefile.toml`). Every push is checked by GitHub Actions.
+The proof builds against Mathlib (pinned in `lakefile.toml`). Every push is checked by GitHub Actions:
+a plain build, plus [Palomar](https://palomar-registry.org)'s mechanical preflight.
 
 ```bash
 lake exe cache get
 lake build
 ```
 
-You can also paste `EmlRichardson.lean` into <https://live.lean-lang.org>.
+## How it was made
+
+The author chose the problem and its requirements and directed the work. Most of the Lean code was
+written by an AI agent (Claude Code). Every proof is checked by the Lean kernel, but the statements
+have not been reviewed independently by a human expert. Novelty has not been established by a
+literature search: the result is the expected consequence of Richardson's theorem, and this project's
+contribution is the complete treatment of branch cuts and the machine-checked proof.
+
+## Licence
+
+Apache-2.0. See [`LICENSE`](LICENSE).

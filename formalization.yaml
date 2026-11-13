@@ -1,0 +1,167 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/mathlib-initiative/formalization.yaml/main/schema/formalization.schema.json
+version: "v0.4"
+
+project:
+  name: "EML trees: zero-equivalence and root existence are undecidable, assuming Richardson's theorem"
+  description: >-
+    The binary operator eml(x, y) = exp(x) - ln(y), with the constant 1 and a variable x,
+    generates the elementary functions (Odrzywolek, arXiv:2603.21852). We formalize, in
+    Lean 4 with Mathlib, a computable translation of Richardson expressions (built from
+    rationals, pi, ln 2, x, +, *, sin, exp and |.|) into EML trees evaluated over the
+    complex numbers with the principal logarithm. The translation preserves the value at
+    every real x, including 0 and negative values, and no compiled tree ever applies log
+    to 0 at any real input. Consequently, assuming Richardson's theorem as an explicit
+    hypothesis, deciding whether an EML tree is identically zero on the reals, and
+    deciding whether it has a real root, are both not computable. Both results also hold
+    when log 0 is left undefined or is assigned any fixed value, so they do not depend on
+    a convention for log 0. The delicate part is controlling the branch cuts of the
+    complex logarithm: signed arithmetic is carried out through positive quantities, pi
+    and sin are obtained through complex values with imaginary parts kept inside
+    (-pi, pi], and the absolute value is computed as a times the sign of a, where the
+    sign is read off the branch cut of log without ever taking log 0.
+  authors:
+    - "Aritra Pramanik"
+  responsible_maintainers:
+    - "Aritra Pramanik"
+  license: "Apache-2.0"
+
+sources:
+  - title: "Undecidability of zero-equivalence and root existence for EML trees, conditional on Richardson's theorem"
+    type: "original-proof"
+    relationship: "other"
+    note: >-
+      The reduction and its formalization are presented here. Novelty has not been
+      established by a literature search: the result is the expected consequence of
+      Richardson's theorem combined with the completeness of EML for elementary
+      functions, and may be known informally. What this project adds is a complete
+      treatment of the complex branch cuts valid at every real input, independence from
+      the convention for log 0, and a machine-checked proof including the Goedel
+      numberings and the computability of the translation.
+  - title: "Some undecidable problems involving elementary functions of a real variable"
+    authors: ["Daniel Richardson"]
+    id: "Journal of Symbolic Logic 33(4):514-520, 1968; doi:10.2307/2271358"
+    type: "paper"
+    relationship: "background"
+    note: >-
+      Richardson's theorem is not proved here. It is an explicit hypothesis of every
+      undecidability theorem, stated for the Goedel numbering of Richardson expressions
+      fixed in Challenge.lean.
+    author_endorsement: "n/a"
+  - title: "All elementary functions from a single binary operator"
+    authors: ["Andrzej Odrzywolek"]
+    id: "arXiv:2603.21852"
+    type: "paper"
+    relationship: "background"
+    note: >-
+      Introduces the EML operator and its grammar S -> 1 | eml(S, S). The log gadget
+      eml(1, eml(eml(1, s), 1)) used here is the paper's formula for ln.
+    author_endorsement: "not-contacted"
+
+related_formalizations:
+  - id: "https://github.com/tomdif/eml-lean"
+    relationship: "independent"
+    note: >-
+      An existing Lean development of EML. This project defines its own EmlExpr type with
+      the same grammar and does not depend on it.
+
+classification:
+  arxiv: ["math.LO", "cs.LO"]
+  msc2020: ["03D35", "03B25", "26A09", "68V20"]
+
+status:
+  scope: >-
+    Complete for the stated results. Richardson's theorem itself is assumed as a
+    hypothesis, not proved.
+  sorry_count: 0
+  sorry_in_definitions: 0
+  axioms: ["propext", "Classical.choice", "Quot.sound"]
+  main_results:
+    - declaration: "EmlRichardson.compiler_exists"
+      file: "Solution.lean"
+      sorry_count: 0
+      axioms: ["propext", "Classical.choice", "Quot.sound"]
+      comparator_config: "comparator.json"
+    - declaration: "EmlRichardson.eml_zero_undecidable_final"
+      file: "Solution.lean"
+      sorry_count: 0
+      axioms: ["propext", "Classical.choice", "Quot.sound"]
+      comparator_config: "comparator.json"
+      literature_dependencies:
+        - statement: "Richardson's theorem: zero-equivalence of Richardson expressions on the reals is undecidable (taken as a hypothesis)"
+          source: "Some undecidable problems involving elementary functions of a real variable"
+    - declaration: "EmlRichardson.eml_root_undecidable_final"
+      file: "Solution.lean"
+      sorry_count: 0
+      axioms: ["propext", "Classical.choice", "Quot.sound"]
+      comparator_config: "comparator.json"
+      literature_dependencies:
+        - statement: "Richardson's theorem: root existence for Richardson expressions on the reals is undecidable (taken as a hypothesis)"
+          source: "Some undecidable problems involving elementary functions of a real variable"
+    - declaration: "EmlRichardson.eml_zero_undecidable_partial"
+      file: "Solution.lean"
+      comparator_config: "comparator.json"
+    - declaration: "EmlRichardson.eml_root_undecidable_partial"
+      file: "Solution.lean"
+      comparator_config: "comparator.json"
+    - declaration: "EmlRichardson.eml_zero_undecidable_any"
+      file: "Solution.lean"
+      comparator_config: "comparator.json"
+    - declaration: "EmlRichardson.eml_root_undecidable_any"
+      file: "Solution.lean"
+      comparator_config: "comparator.json"
+
+automation:
+  methods:
+    - method: "agent"
+      models: ["claude-opus-5-5"]
+      framework: "Claude Code"
+      tool_setup: >-
+        AI coding agent writing Lean source and checking it in the live.lean-lang.org web
+        editor and in GitHub Actions builds against the pinned Mathlib.
+      prompting_notes: >-
+        The human author chose the problem (the Richardson-to-EML reduction), the
+        hypotheses, and the requirements (validity at every real input, no reliance on
+        log 0), directed each stage, and decided what to publish. The agent designed the
+        gadgets and wrote the Lean proofs.
+  spend_usd: "subscription-based usage"
+  notes: >-
+    Most of the Lean code was written by the AI agent under the author's direction. All
+    proofs are checked by the Lean kernel; correctness of the statements was not
+    separately reviewed by a human expert.
+
+fidelity:
+  divergences: >-
+    Richardson's theorem is a hypothesis, stated against an explicit Goedel numbering of
+    Richardson expressions; the original theorem is phrased informally for expressions
+    over the same basis. EML trees are evaluated over C with Mathlib's principal
+    Complex.log; the partial (evalO) and arbitrary-value (evalJ) semantics show the results
+    do not depend on the value of log 0. Rationals are represented as (p - q)/(d + 1) with
+    natural numbers p, q, d.
+
+review:
+  status: "unchecked"
+  notes: >-
+    Machine-checked by the Lean kernel (no sorry; axioms propext, Classical.choice,
+    Quot.sound). No independent human review of the statements has been performed.
+
+alignment:
+  namespace: "EmlRichardson"
+  statements:
+    - source: "Existence of a computable, value-preserving, log-0-free translation into EML trees"
+      lean: "EmlRichardson.compiler_exists"
+      module: "Challenge"
+      status: "proved"
+    - source: "Zero-equivalence of EML trees is undecidable (given Richardson)"
+      lean: "EmlRichardson.eml_zero_undecidable_final"
+      module: "Challenge"
+      status: "proved"
+    - source: "Root existence for EML trees is undecidable (given Richardson)"
+      lean: "EmlRichardson.eml_root_undecidable_final"
+      module: "Challenge"
+      status: "proved"
+    - source: "Both results with log 0 undefined, or set to any value c"
+      lean: "EmlRichardson.eml_zero_undecidable_partial, eml_root_undecidable_partial, eml_zero_undecidable_any, eml_root_undecidable_any"
+      module: "Challenge"
+      status: "proved"
+
+acknowledgements: "Built on Mathlib."

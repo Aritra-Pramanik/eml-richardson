@@ -8,3 +8,4 @@ rev = "3d487513e531989025f4d93d91f01bab71248014"
 
 [[lean_lib]]
 name = "EmlRichardson"
+roots = ["Challenge", "Solution"]

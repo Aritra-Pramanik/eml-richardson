@@ -1,5 +1,9 @@
-/-
-  EmlRichardson.lean — Richardson's theorem ⇒ EML zero/root problems undecidable
+module
+
+public import Mathlib
+
+/-!
+# Solution: Richardson's theorem ⇒ EML zero/root problems undecidable
   Checked on live.lean-lang.org (Lean v4.36.0-rc2 + latest Mathlib), 2026-11-13.
   No `sorry`: every theorem depends only on propext, Classical.choice, Quot.sound.
 
@@ -29,10 +33,12 @@
             Richardson's theorem.                                       (proved)
     Part 8  No compiled tree ever takes log 0, so the results hold with log 0
             undefined, or set to any value.                              (proved)
+    Part 9  The statements of Challenge.lean, proved.                  (proved)
 
-  To plug into tomdif/eml-lean, replace the local EmlExpr/ceml with `import EML`.
+
 -/
-import Mathlib
+
+@[expose] public section
 
 namespace EmlRichardson
 
@@ -1392,8 +1398,21 @@ theorem eml_root_undecidable_any (c : ℂ)
     ⟨compile theGadgets, compile_computable, fun e => by
       simp only [compile_evalJ, Complex.ofReal_eq_zero]⟩ h)
 
+/-! ## Part 9 — The statement `compiler_exists` of Challenge.lean -/
+
+/-- **The reduction.** There is a computable translation of Richardson expressions into
+    EML trees that preserves the value at every real `x` (0 and negative values included)
+    and never takes `log 0` at any real input. -/
+theorem compiler_exists :
+    ∃ f : RExpr → EmlExpr, Computable f ∧
+      ∀ (e : RExpr) (x : ℝ), (f e).evalC x = ((e.eval x : ℝ) : ℂ) ∧ Safe (x : ℂ) (f e) :=
+  ⟨compile theGadgets, compile_computable, fun e x => ⟨compile_correct theGadgets e x, compile_safe x e⟩⟩
+
 end EmlRichardson
 
+end
+
+#print axioms EmlRichardson.compiler_exists
 #print axioms EmlRichardson.gadgets_exist
 #print axioms EmlRichardson.compile_computable
 #print axioms EmlRichardson.eml_zero_undecidable_final

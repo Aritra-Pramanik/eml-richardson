@@ -1,0 +1,14 @@
+{
+  "challenge_module": "Challenge",
+  "solution_module": "Solution",
+  "theorem_names": [
+    "EmlRichardson.compiler_exists",
+    "EmlRichardson.eml_zero_undecidable_final",
+    "EmlRichardson.eml_root_undecidable_final",
+    "EmlRichardson.eml_zero_undecidable_partial",
+    "EmlRichardson.eml_root_undecidable_partial",
+    "EmlRichardson.eml_zero_undecidable_any",
+    "EmlRichardson.eml_root_undecidable_any"
+  ],
+  "permitted_axioms": ["propext", "Quot.sound", "Classical.choice"]
+}
