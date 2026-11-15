@@ -1408,6 +1408,106 @@ theorem compiler_exists :
       ∀ (e : RExpr) (x : ℝ), (f e).evalC x = ((e.eval x : ℝ) : ℂ) ∧ Safe (x : ℂ) (f e) :=
   ⟨compile theGadgets, compile_computable, fun e x => ⟨compile_correct theGadgets e x, compile_safe x e⟩⟩
 
+
+/-! ## Part 10 — More undecidable problems
+
+Three further decision problems for EML trees, each reduced from Richardson's
+zero-equivalence problem with the same concrete compiler:
+
+* equivalence: do two EML trees agree at every real `x`?
+* negativity: does a tree take a negative real value at some real `x`?
+* constancy: is a tree constant on ℝ?
+
+Negativity uses the complement of the zero problem (`ComputablePred.not`); constancy uses
+the continuity of Richardson expressions. -/
+
+/-- Every Richardson expression denotes a continuous function of `x`. -/
+theorem eval_continuous : ∀ e : RExpr, Continuous (fun x : ℝ => e.eval x)
+  | .rat p q d => by simp only [RExpr.eval]; exact continuous_const
+  | .pi => by simp only [RExpr.eval]; exact continuous_const
+  | .ln2 => by simp only [RExpr.eval]; exact continuous_const
+  | .var => by simp only [RExpr.eval]; exact continuous_id
+  | .add a b => by simp only [RExpr.eval]; exact (eval_continuous a).add (eval_continuous b)
+  | .mul a b => by simp only [RExpr.eval]; exact (eval_continuous a).mul (eval_continuous b)
+  | .sin a => by simp only [RExpr.eval]; exact Real.continuous_sin.comp (eval_continuous a)
+  | .exp a => by simp only [RExpr.eval]; exact Real.continuous_exp.comp (eval_continuous a)
+  | .abs a => by simp only [RExpr.eval]; exact continuous_abs.comp (eval_continuous a)
+
+/-- `e ≡ 0` iff the compiled tree of `e` agrees everywhere with the compiled tree of 0. -/
+theorem equivPb_iff (e : RExpr) :
+    (∀ x : ℝ, e.eval x = 0) ↔
+      ∀ x : ℝ, (compile theGadgets e).evalC x = (compile theGadgets (.rat 0 0 0)).evalC x := by
+  simp [compile_correct, RExpr.eval]
+
+/-- `e ≢ 0` iff the compiled tree of `-|e|` is negative somewhere. -/
+theorem negPb_iff (e : RExpr) :
+    (¬ ∀ x : ℝ, e.eval x = 0) ↔
+      ∃ x : ℝ, ∃ r : ℝ, r < 0 ∧
+        (compile theGadgets (.mul (.rat 0 1 0) (.abs e))).evalC x = r := by
+  simp only [compile_correct, RExpr.eval, Complex.ofReal_inj]
+  constructor
+  · intro h
+    push_neg at h
+    obtain ⟨x, hx⟩ := h
+    exact ⟨x, _, by norm_num [hx], rfl⟩
+  · rintro ⟨x, r, hr, hx⟩ h
+    rw [h x] at hx
+    norm_num at hx
+    linarith
+
+/-- `e ≡ 0` iff the compiled tree of `x · e` is constant. The converse direction uses
+    continuity: `x · e(x) = 0` forces `e = 0` off 0, hence everywhere. -/
+theorem constPb_iff (e : RExpr) :
+    (∀ x : ℝ, e.eval x = 0) ↔
+      ∃ c : ℂ, ∀ x : ℝ, (compile theGadgets (.mul .var e)).evalC x = c := by
+  simp only [compile_correct, RExpr.eval]
+  constructor
+  · intro h
+    exact ⟨0, fun x => by simp [h x]⟩
+  · rintro ⟨c, hc⟩
+    have h0 : c = 0 := by simpa using (hc 0).symm
+    have hne : ∀ x : ℝ, x ≠ 0 → e.eval x = 0 := fun x hx => by
+      have := hc x
+      rw [h0, Complex.ofReal_eq_zero, mul_eq_zero] at this
+      exact this.resolve_left hx
+    have heq : (fun x => e.eval x) = fun _ => (0 : ℝ) :=
+      Continuous.ext_on (dense_compl_singleton (0 : ℝ)) (eval_continuous e) continuous_const
+        (fun x hx => hne x (by simpa using hx))
+    exact fun x => congrFun heq x
+
+theorem negF_computable :
+    Computable (fun e : RExpr => compile theGadgets (.mul (.rat 0 1 0) (.abs e))) :=
+  ((gMul_prim.comp (Primrec.const (compile theGadgets (.rat 0 1 0)))
+    (gAbs_prim.comp compile_prim)).to_comp).of_eq fun _ => rfl
+
+theorem constF_computable :
+    Computable (fun e : RExpr => compile theGadgets (.mul .var e)) :=
+  ((gMul_prim.comp (Primrec.const EmlExpr.var) compile_prim).to_comp).of_eq fun _ => rfl
+
+/-- **Equivalence of two EML trees is undecidable**, assuming Richardson's theorem. -/
+theorem eml_equiv_undecidable
+    (richardson : ¬ ComputablePred (fun e : RExpr => ∀ x : ℝ, e.eval x = 0)) :
+    ¬ ComputablePred (fun p : EmlExpr × EmlExpr => ∀ x : ℝ, p.1.evalC x = p.2.evalC x) :=
+  fun h => richardson (ComputablePred.computable_of_manyOneReducible
+    ⟨fun e => (compile theGadgets e, compile theGadgets (.rat 0 0 0)),
+      compile_computable.pair (Computable.const _), equivPb_iff⟩ h)
+
+/-- **Negativity of an EML tree is undecidable**: whether it takes a negative real value
+    at some real `x`, assuming Richardson's theorem. -/
+theorem eml_neg_undecidable
+    (richardson : ¬ ComputablePred (fun e : RExpr => ∀ x : ℝ, e.eval x = 0)) :
+    ¬ ComputablePred (fun t : EmlExpr => ∃ x : ℝ, ∃ r : ℝ, r < 0 ∧ t.evalC x = r) := fun h => by
+  have h1 : ComputablePred (fun e : RExpr => ¬ ∀ x : ℝ, e.eval x = 0) :=
+    ComputablePred.computable_of_manyOneReducible ⟨_, negF_computable, negPb_iff⟩ h
+  exact richardson (by simpa only [not_not] using h1.not)
+
+/-- **Constancy of an EML tree on ℝ is undecidable**, assuming Richardson's theorem. -/
+theorem eml_const_undecidable
+    (richardson : ¬ ComputablePred (fun e : RExpr => ∀ x : ℝ, e.eval x = 0)) :
+    ¬ ComputablePred (fun t : EmlExpr => ∃ c : ℂ, ∀ x : ℝ, t.evalC x = c) :=
+  fun h => richardson (ComputablePred.computable_of_manyOneReducible
+    ⟨_, constF_computable, constPb_iff⟩ h)
+
 end EmlRichardson
 
 end
@@ -1422,3 +1522,6 @@ end
 #print axioms EmlRichardson.eml_root_undecidable_partial
 #print axioms EmlRichardson.eml_zero_undecidable_any
 #print axioms EmlRichardson.eml_root_undecidable_any
+#print axioms EmlRichardson.eml_equiv_undecidable
+#print axioms EmlRichardson.eml_neg_undecidable
+#print axioms EmlRichardson.eml_const_undecidable

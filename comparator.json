@@ -12,7 +12,10 @@
     "EmlRichardson.eml_zero_undecidable_partial",
     "EmlRichardson.eml_root_undecidable_partial",
     "EmlRichardson.eml_zero_undecidable_any",
-    "EmlRichardson.eml_root_undecidable_any"
+    "EmlRichardson.eml_root_undecidable_any",
+    "EmlRichardson.eml_equiv_undecidable",
+    "EmlRichardson.eml_neg_undecidable",
+    "EmlRichardson.eml_const_undecidable"
   ],
   "permitted_axioms": [
     "propext",
