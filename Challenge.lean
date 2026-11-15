@@ -226,6 +226,29 @@ theorem eml_root_undecidable_any (c : ℂ)
     ¬ ComputablePred (fun t : EmlExpr => ∃ x : ℝ, t.evalJ c x = 0) := by
   sorry
 
+
+/-! ## Further undecidable problems -/
+
+/-- **Equivalence of two EML trees is undecidable**: whether they agree at every real `x`,
+    assuming Richardson's theorem. -/
+theorem eml_equiv_undecidable
+    (richardson : ¬ ComputablePred (fun e : RExpr => ∀ x : ℝ, e.eval x = 0)) :
+    ¬ ComputablePred (fun p : EmlExpr × EmlExpr => ∀ x : ℝ, p.1.evalC x = p.2.evalC x) := by
+  sorry
+
+/-- **Negativity of an EML tree is undecidable**: whether it takes a negative real value
+    at some real `x`, assuming Richardson's theorem. -/
+theorem eml_neg_undecidable
+    (richardson : ¬ ComputablePred (fun e : RExpr => ∀ x : ℝ, e.eval x = 0)) :
+    ¬ ComputablePred (fun t : EmlExpr => ∃ x : ℝ, ∃ r : ℝ, r < 0 ∧ t.evalC x = r) := by
+  sorry
+
+/-- **Constancy of an EML tree on ℝ is undecidable**, assuming Richardson's theorem. -/
+theorem eml_const_undecidable
+    (richardson : ¬ ComputablePred (fun e : RExpr => ∀ x : ℝ, e.eval x = 0)) :
+    ¬ ComputablePred (fun t : EmlExpr => ∃ c : ℂ, ∀ x : ℝ, t.evalC x = c) := by
+  sorry
+
 end EmlRichardson
 
 end
