@@ -26,6 +26,9 @@ The proof contains no `sorry`. Every theorem uses only Lean's standard axioms (`
 | `compile_safe` | no compiled tree ever takes log 0, at any real input |
 | `eml_zero_undecidable_partial`, `eml_root_undecidable_partial` | same results with log 0 left **undefined** |
 | `eml_zero_undecidable_any`, `eml_root_undecidable_any` | same results with log 0 set to **any** value c |
+| `eml_equiv_undecidable` | Richardson ⇒ "do two EML trees agree at every real x?" is not computable |
+| `eml_neg_undecidable` | Richardson ⇒ "does t take a negative real value somewhere?" is not computable |
+| `eml_const_undecidable` | Richardson ⇒ "is t constant on ℝ?" is not computable |
 
 The only hypothesis is Richardson's theorem itself, stated against an explicit Gödel
 numbering of Richardson expressions (rationals, π, ln 2, x, +, ×, sin, exp, |·|).
