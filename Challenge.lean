@@ -16,6 +16,9 @@ This file states, assuming **Richardson's theorem** as a hypothesis:
   at any real input.
 * `eml_zero_undecidable` / `eml_root_undecidable`: deciding whether an EML tree is
   identically zero on ℝ, or has a real root, is not computable.
+* `eml_equiv_undecidable`, `eml_neg_undecidable`, `eml_const_undecidable`: deciding
+  whether two EML trees agree on ℝ, whether a tree is ever negative, or whether it is
+  constant, is not computable either.
 * `…_partial` and `…_any`: the same two statements hold when `log 0` is undefined
   (partial semantics `evalO`) or is given any fixed value `c` (semantics `evalJ c`).
   So the results do not depend on Mathlib's convention `Complex.log 0 = 0`.
