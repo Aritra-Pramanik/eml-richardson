@@ -2,6 +2,9 @@
 
 A Lean 4 + Mathlib formalization of the reduction
 
+**Registered on Palomar** as [PALOMAR-2026-11-21-000017](https://palomar-registry.org/entry.html?id=PALOMAR-2026-11-21-000017&version=1)
+(version 1, commit `cd3512e`): checked by Comparator, by Lean's kernel and by two independent kernels.
+
 > **Richardson's zero problem ≤ EML zero problem**
 
 for the single binary operator **eml(x, y) = exp x − ln y**
