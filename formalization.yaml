@@ -14,7 +14,11 @@ project:
     hypothesis, deciding whether an EML tree is identically zero on the reals, and
     deciding whether it has a real root, are both not computable. Both results also hold
     when log 0 is left undefined or is assigned any fixed value, so they do not depend on
-    a convention for log 0. The delicate part is controlling the branch cuts of the
+    a convention for log 0. With the same compiler, three further problems are
+    undecidable under the same hypothesis: whether two EML trees agree at every real x,
+    whether a tree takes a negative real value at some real x, and whether a tree is
+    constant on the reals (using continuity of Richardson expressions). The delicate
+    part is controlling the branch cuts of the
     complex logarithm: signed arithmetic is carried out through positive quantities, pi
     and sin are obtained through complex values with imaginary parts kept inside
     (-pi, pi], and the absolute value is computed as a times the sign of a, where the
